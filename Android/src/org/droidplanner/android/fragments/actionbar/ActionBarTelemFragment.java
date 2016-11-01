@@ -13,6 +13,10 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.o3dr.android.client.Drone;
+import com.o3dr.android.client.MavlinkObserver;
+import com.o3dr.services.android.lib.mavlink.MavlinkMessageWrapper;
+import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.ardupilotmega.msg_rangefinder;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.property.Altitude;
@@ -125,6 +129,9 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
 
     private TextView homeTelem;
     private TextView altitudeTelem;
+    private TextView temperatureTelem;
+    private double temperature = 0;
+
 
     private TextView gpsTelem;
     private PopupWindow gpsPopup;
@@ -138,6 +145,8 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
     private TextView flightModeTelem;
 
     private String emptyString;
+
+    private MavlinkObserver mavlinkObserver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -168,6 +177,7 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
         });
 
         altitudeTelem = (TextView) view.findViewById(R.id.bar_altitude);
+        temperatureTelem = (TextView) view.findViewById(R.id.bar_temp);
 
         gpsTelem = (TextView) view.findViewById(R.id.bar_gps);
         final View gpsPopupView = inflater.inflate(R.layout.popup_info_gps, (ViewGroup) view, false);
@@ -221,12 +231,26 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
         final View view = getView();
         if (view != null)
             view.setVisibility(View.VISIBLE);
+
+        mavlinkObserver = new MavlinkObserver() {
+            @Override
+            public void onMavlinkMessageReceived(MavlinkMessageWrapper mavlinkMessageWrapper) {
+                MAVLinkMessage Mm = mavlinkMessageWrapper.getMavLinkMessage();
+                if(Mm.msgid == msg_rangefinder.MAVLINK_MSG_ID_RANGEFINDER) {
+                    msg_rangefinder rangefinder = (msg_rangefinder)Mm.pack().unpack();
+                    temperature = rangefinder.distance;
+                }
+            }
+        };
+        getDrone().addMavlinkObserver(mavlinkObserver);
     }
 
     private void hideTelemBar() {
         final View view = getView();
         if (view != null)
             view.setVisibility(View.GONE);
+        
+        getDrone().removeMavlinkObserver(mavlinkObserver);
     }
 
     @Override
@@ -238,10 +262,11 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
     @Override
     public void onApiConnected() {
         final Drone drone = getDrone();
-        if (drone.isConnected())
+        if (drone.isConnected()) {
             showTelemBar();
-        else
+        } else {
             hideTelemBar();
+        }
 
         updateAllTelem();
         getBroadcastManager().registerReceiver(eventReceiver, eventFilter);
@@ -259,6 +284,7 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
         updateHomeTelem();
         updateBatteryTelem();
         updateAltitudeTelem();
+        updateRangeTelem();
     }
 
     private void updateFlightModeTelem() {
@@ -497,6 +523,14 @@ public class ActionBarTelemFragment extends ApiListenerFragment {
 
             this.altitudeTelem.setText(altUnit.toString());
         }
+
+        updateRangeTelem();
     }
+
+    private void updateRangeTelem() {
+        this.temperatureTelem.setText(String.format(Locale.US, "%2.1f°", temperature));
+    }
+
+
 
 }
