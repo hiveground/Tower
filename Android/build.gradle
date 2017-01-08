@@ -21,10 +21,10 @@ dependencies {
     compile 'com.github.gabrielemariotti.changeloglib:changelog:2.0.0'
 
     //DroneKit-Android client lib
-    compile 'com.o3dr.android:dronekit-android:3.0.2'
+    //compile 'com.o3dr.android:dronekit-android:3.0.2'
     //Comment line above, and uncomment line below to use your local version of the dronekit-android client lib
     //Don't forget to uncomment the lines in the settings.gradle file as well.
-//     compile project(':ClientLib')
+    compile project(':ClientLib')
 
     compile 'me.grantland:autofittextview:0.2.1'
     compile(name:'shimmer-android-release', ext:'aar')
@@ -55,13 +55,13 @@ dependencies {
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 }
 
-def versionPrefix = "Tower-v"
+def versionPrefix = "HiveGround-AIF-v"
 
 //Decomposed version name and code (https://plus.google.com/+JakeWharton/posts/6f5TcVPRZij)
-def versionMajor = 4
+def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 10 //bump for dogfood builds, public betas, etc.
+def versionBuild = 0 //bump for dogfood builds, public betas, etc.
 
 //Logging levels
 def logLevelVerbose = 2;
@@ -80,7 +80,7 @@ android {
     }
 
     defaultConfig {
-        applicationId 'com.hiveground.android.tower.aif'
+        applicationId 'com.hiveground.android.aif'
         minSdkVersion android_build_min_sdk_version
         targetSdkVersion android_build_target_sdk_version
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
@@ -135,10 +135,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile getAppKeystoreFile()
-            storePassword getAppKeystorePassword()
-            keyAlias getAppKey()
-            keyPassword getAppKeyPassword()
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
         }
     }
 
@@ -149,7 +149,7 @@ android {
                 def buildType = variant.buildType.getName()
                 def flavorName = variant.getFlavorName()
                 def versionCode = defaultConfig.versionCode
-                output.outputFile = new File(file.parent, "tower-aif-${flavorName}-${buildType}.${versionCode}.apk")
+                output.outputFile = new File(file.parent, "hiveground-aif-${flavorName}-${buildType}.${versionCode}.apk")
             }
         }
     }
@@ -188,7 +188,7 @@ android {
     productFlavors {
         dev {
             applicationIdSuffix ".debug"
-            resValue "string", "app_title", "TowerAIF Dev"
+            resValue "string", "app_title", "HiveGround AIF Dev"
             resValue "string", "baidu_api_key", ""
             versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, "debug.${versionBuild}")
 
@@ -198,7 +198,7 @@ android {
 
         beta {
             applicationIdSuffix ".beta"
-            resValue "string", "app_title", "TowerAIF Beta"
+            resValue "string", "app_title", "HiveGround AIF Beta"
             resValue "string", "baidu_api_key", "4x7A3lUHEmzFxosafDa4bLP7yinmEnPh"
             versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, "beta.${versionBuild}")
 
@@ -207,7 +207,7 @@ android {
         }
 
         prod {
-            resValue "string", "app_title", "TowerAIF"
+            resValue "string", "app_title", "HiveGround AIF"
             resValue "string", "baidu_api_key", "41mPy2URFjOL61GzyWk8U5oLhhwSYGWe"
             buildConfigField "boolean", "WRITE_LOG_FILE", "false"
 

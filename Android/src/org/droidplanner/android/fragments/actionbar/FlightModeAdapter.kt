@@ -23,14 +23,28 @@ import org.droidplanner.android.utils.analytics.GAUtils
 public class FlightModeAdapter(context: Context, val drone: Drone) : SelectionListAdapter<VehicleMode>(context) {
 
     private var selectedMode: VehicleMode
-    private val flightModes : List<VehicleMode>
+    private val flightModesTemp : List<VehicleMode>
+    private val flightModes : MutableList<VehicleMode> = mutableListOf<VehicleMode>()
 
     init {
         val state: State = drone.getAttribute(AttributeType.STATE)
         selectedMode = state.vehicleMode
 
         val type: Type = drone.getAttribute(AttributeType.TYPE);
-        flightModes = VehicleMode.getVehicleModePerDroneType(type.droneType)
+        flightModesTemp = VehicleMode.getVehicleModePerDroneType(type.droneType)
+
+        //Allow only relavent modes
+        for (item in flightModesTemp)
+        {
+            when (item.mode) {
+                VehicleMode.COPTER_STABILIZE.mode -> flightModes.add(item)
+                VehicleMode.COPTER_ALT_HOLD.mode -> flightModes.add(item)
+                VehicleMode.COPTER_LOITER.mode -> flightModes.add(item)
+                VehicleMode.COPTER_AUTO.mode -> flightModes.add(item)
+                VehicleMode.COPTER_RTL.mode -> flightModes.add(item)
+                VehicleMode.COPTER_GUIDED.mode -> flightModes.add(item)
+            }
+        }
     }
 
     override fun getCount() = flightModes.size
