@@ -80,7 +80,7 @@ android {
     }
 
     defaultConfig {
-        applicationId 'org.droidplanner.android'
+        applicationId 'com.hiveground.android.tower.aif'
         minSdkVersion android_build_min_sdk_version
         targetSdkVersion android_build_target_sdk_version
         versionCode computeVersionCode(versionMajor, versionMinor, versionPatch, versionBuild)
@@ -149,7 +149,7 @@ android {
                 def buildType = variant.buildType.getName()
                 def flavorName = variant.getFlavorName()
                 def versionCode = defaultConfig.versionCode
-                output.outputFile = new File(file.parent, "tower-${flavorName}-${buildType}.${versionCode}.apk")
+                output.outputFile = new File(file.parent, "tower-aif-${flavorName}-${buildType}.${versionCode}.apk")
             }
         }
     }
@@ -188,7 +188,7 @@ android {
     productFlavors {
         dev {
             applicationIdSuffix ".debug"
-            resValue "string", "app_title", "Tower Dev"
+            resValue "string", "app_title", "TowerAIF Dev"
             resValue "string", "baidu_api_key", ""
             versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, "debug.${versionBuild}")
 
@@ -198,7 +198,7 @@ android {
 
         beta {
             applicationIdSuffix ".beta"
-            resValue "string", "app_title", "Tower Beta"
+            resValue "string", "app_title", "TowerAIF Beta"
             resValue "string", "baidu_api_key", "4x7A3lUHEmzFxosafDa4bLP7yinmEnPh"
             versionName generateVersionName(versionPrefix, versionMajor, versionMinor, versionPatch, "beta.${versionBuild}")
 
@@ -207,7 +207,7 @@ android {
         }
 
         prod {
-            resValue "string", "app_title", "Tower"
+            resValue "string", "app_title", "TowerAIF"
             resValue "string", "baidu_api_key", "41mPy2URFjOL61GzyWk8U5oLhhwSYGWe"
             buildConfigField "boolean", "WRITE_LOG_FILE", "false"
 
@@ -226,7 +226,7 @@ android {
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "${hasFabricApiKey()}"
         }
     }
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '25'
 }
 
 /**
@@ -244,20 +244,20 @@ def getGitVersion(){
 }
 
 def getAppKeystoreFile() {
-    def filePath = hasProperty('ORG_DROIDPLANNER_ANDROID_KEYSTORE') ? ORG_DROIDPLANNER_ANDROID_KEYSTORE : null
+    def filePath = project.hasProperty('ORG_DROIDPLANNER_ANDROID_KEYSTORE') ? ORG_DROIDPLANNER_ANDROID_KEYSTORE : null
     return filePath ? file(filePath) : null
 }
 
 def getAppKeystorePassword(){
-    return hasProperty('ORG_DROIDPLANNER_ANDROID_KEYSTORE_PWD') ? ORG_DROIDPLANNER_ANDROID_KEYSTORE_PWD : ''
+    return project.hasProperty('ORG_DROIDPLANNER_ANDROID_KEYSTORE_PWD') ? ORG_DROIDPLANNER_ANDROID_KEYSTORE_PWD : ''
 }
 
 def getAppKeyPassword() {
-    return hasProperty('ORG_DROIDPLANNER_ANDROID_KEY_PWD') ? ORG_DROIDPLANNER_ANDROID_KEY_PWD : ''
+    return project.hasProperty('ORG_DROIDPLANNER_ANDROID_KEY_PWD') ? ORG_DROIDPLANNER_ANDROID_KEY_PWD : ''
 }
 
 def getAppKey() {
-    return hasProperty('ORG_DROIDPLANNER_ANDROID_KEY_ALIAS') ? ORG_DROIDPLANNER_ANDROID_KEY_ALIAS : ''
+    return project.hasProperty('ORG_DROIDPLANNER_ANDROID_KEY_ALIAS') ? ORG_DROIDPLANNER_ANDROID_KEY_ALIAS : ''
 }
 
 def getFabricApiKey(){
@@ -265,5 +265,5 @@ def getFabricApiKey(){
 }
 
 def hasFabricApiKey(){
-    return hasProperty('COM_O3DR_FABRIC_API_KEY')
+    return project.hasProperty('COM_O3DR_FABRIC_API_KEY')
 }
